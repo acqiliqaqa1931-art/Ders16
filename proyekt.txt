@@ -1,0 +1,261 @@
+import tkinter as tk
+from tkinter import messagebox
+
+user_data={}
+
+def register_page():
+    reg=tk.Toplevel(root)
+    reg.title("Xestexana Qeydiyyati")
+    reg.geometry("300x350")
+
+
+    tk.Label(reg,text="Xestenin adi").pack(pady=5)
+    ent_user=tk.Entry(reg)
+    ent_user.pack()
+
+    tk.Label(reg,text="Xestenin xesteliyi").pack(pady=5)
+    ent_illness=tk.Entry(reg)
+    ent_illness.pack()
+
+    tk.Label(reg,text="Xestenin soyadi").pack(pady=5)
+    ent_nickname=tk.Entry(reg)
+    ent_nickname.pack()
+
+    tk.Label(reg,text="Xestenin yasi").pack(pady=5)
+    ent_age=tk.Entry(reg)
+    ent_age.pack()
+
+    tk.Label(reg,text="Xestenin nomresi").pack(pady=5)
+    ent_number=tk.Entry(reg)
+    ent_number.pack()
+
+    def register():
+        username=ent_user.get()
+        illness=ent_illness.get()
+        nickname=ent_nickname.get()
+        age=ent_age.get()
+        number=ent_number.get()
+
+        if not username or not illness or not nickname or not age or not number:
+             messagebox.showerror("Xeta","Qeydiyyati tam doldurun!")
+             return
+
+        if username and nickname in user_data:
+             messagebox.showerror("Xeta","Xestenin adi ve soyadi istifade olunur!")
+             return
+
+        if not age.isdigit() or not number.isdigit():
+            messagebox.showerror("Xeta","Yas ve Elaqe nomresi reqem olmalidir!")
+            return
+
+        user_data[username]={
+            "username":username,
+            "illness":illness,
+            "nickname":nickname,
+            "age":age,
+            "number":number
+        }
+        messagebox.showinfo("OK","Qeydiyyat tamamlandi")
+        reg.destroy()
+
+    tk.Button(reg,text="Qeyd ol",bg="green",fg="white",command=register).pack(pady=5)
+
+
+def open_profile(username):
+    prof=tk.Toplevel(root)
+    prof.title("Profil")
+    prof.geometry("300x380")
+
+    user=user_data[username]
+
+    tk.Label(prof,text=f"Profil:{username}",font=("Arial",14,"bold")).pack(pady=10)
+
+    tk.Label(prof,text="Ad").pack()
+
+    ent_user=tk.Entry(prof)
+    ent_user.insert(0,user["username"])
+    ent_user.pack()
+
+    tk.Label(prof,text="Yas").pack()
+
+
+    ent_age=tk.Entry(prof)
+    ent_age.insert(0,user["age"])
+    ent_age.pack()
+
+    tk.Label(prof,text="Nomre").pack()
+
+    ent_number=tk.Entry(prof)
+    ent_number.insert(0,user["number"])
+    ent_number.pack()
+
+    tk.Label(prof,text="Xestelik").pack()
+    ent_illness=tk.Entry(prof)
+    ent_illness.insert(0,user["illness"])
+    ent_illness.pack()
+
+    tk.Label(prof,text="Soyad").pack()
+    ent_nickname=tk.Entry(prof)
+    ent_nickname.insert(0,user["nickname"])
+    ent_nickname.pack()
+
+    def update_info():
+        age1=ent_age.get()
+        number1=ent_number.get()
+
+        if not age1.isdigit() or not number1.isdigit():
+            messagebox.showerror("Xeta","Yas ve ya nomre reqem olmalidir!")
+            return
+
+        user["username"]=ent_user.get()
+        user["age"]=ent_age.get()
+        user["number"]=ent_number.get()
+        user["illness"]=ent_illness.get()
+        user["nickname"]=ent_nickname.get()
+        messagebox.showinfo("OK","Melumat yenilendi")
+        prof.destroy()
+
+
+    def delete_account():
+        if messagebox.askyesno("Tesdiq","Hesabi silmek istiyirsiniz?"):
+            del user_data[username]
+            messagebox.showinfo("OK","Hesab silindi")
+            prof.destroy()
+
+
+    tk.Button(prof,text="Yenile",bg="grey",fg="pink",command=update_info).pack(pady=5)
+
+    tk.Button(prof,text="Hesabi sil",bg="blue",fg="white",command=delete_account).pack(pady=5)
+
+def open_admin_panel():
+    admin_win=tk.Toplevel(root)
+    admin_win.title("Admin Panel")
+    admin_win.geometry("700x700")
+    tk.Label(admin_win,text="Admin Paneli").pack(pady=10)
+
+    listbox=tk.Listbox(admin_win,width=30)
+    listbox.pack(pady=10)
+
+    for username in user_data:
+        listbox.insert(tk.END,username)
+
+    tk.Label(admin_win, text="Ad").pack(pady=5)
+    ent_user = tk.Entry(admin_win)
+    ent_user.pack()
+
+    tk.Label(admin_win, text="Xestelik").pack(pady=5)
+    ent_illness = tk.Entry(admin_win)
+    ent_illness.pack()
+
+    tk.Label(admin_win, text="Yas").pack(pady=5)
+    ent_age = tk.Entry(admin_win)
+    ent_age.pack()
+
+    tk.Label(admin_win, text="Number").pack(pady=5)
+    ent_number = tk.Entry(admin_win)
+    ent_number.pack()
+
+    tk.Label(admin_win,text="Soyad").pack(pady=5)
+    ent_nickname = tk.Entry(admin_win)
+    ent_nickname.pack()
+
+    def select_user(event):
+        selected=listbox.curselection()
+        if selected:
+            username=listbox.get(selected[0])
+            user=user_data[username]
+            ent_user.delete(0,tk.END)
+            ent_user.insert(0,user["username"])
+
+            ent_age.delete(0,tk.END)
+            ent_age.insert(0,user["age"])
+
+            ent_number.delete(0,tk.END)
+            ent_number.insert(0,user["number"])
+
+            ent_illness.delete(0,tk.END)
+            ent_illness.insert(0,user["illness"])
+
+            ent_nickname.delete(0,tk.END)
+            ent_nickname.insert(0,user["nickname"])
+
+
+    listbox.bind("<<ListboxSelect>>",select_user)
+
+    def update_user():
+        selected = listbox.curselection()
+        age2=ent_age.get()
+        number2=ent_number.get()
+        if selected:
+            username = listbox.get(selected[0])
+            if not age2.isdigit() or not number2.isdigit():
+                messagebox.showerror("Xeta", "Yas ve ya nomre reqem olmalidir!")
+                return
+
+
+            user = user_data[username]
+            user["username"]=ent_user.get()
+            user["age"] = ent_age.get()
+            user["number"] = ent_number.get()
+            user["illness"] = ent_illness.get()
+            user["nickname"]=ent_nickname.get()
+            messagebox.showinfo("OK",f"{username} Melumat yenilendi!")
+            admin_win.destroy()
+
+    def delete():
+        selected=listbox.curselection()
+        if selected:
+            username=listbox.get(selected[0])
+            if messagebox.askyesno("Tesdiq", "Hesabi silmek istiyirsiniz?"):
+                del user_data[username]
+                listbox.delete(selected[0])
+
+                ent_user.delete(0,tk.END)
+                ent_age.delete(0,tk.END)
+                ent_number.delete(0,tk.END)
+                messagebox.showinfo("OK",f"{username} silindi!")
+                admin_win.destroy()
+
+    tk.Button(admin_win, text="Yenile", bg="grey", fg="pink", command=update_user).pack(pady=5)
+
+    tk.Button(admin_win, text="Hesabi sil", bg="blue", fg="white", command=delete).pack(pady=5)
+
+
+
+
+def login():
+    username=ent_user.get()
+    number=ent_number.get()
+
+    if username=="admin" and number=="admin123":
+        open_admin_panel()
+
+    elif username in user_data and user_data[username]["number"]==number:
+        open_profile(username)
+    else:
+        messagebox.showerror("Xeta","Login ve ya Sifre sehvdir")
+
+
+
+
+
+root=tk.Tk()
+root.title("Login Sistemi")
+root.geometry("500x500")
+
+tk.Label(root,text="Xestenin adi").pack(pady=5)
+ent_user=tk.Entry(root)
+ent_user.pack()
+
+tk.Label(root,text="Xestenin nomresi").pack(pady=5)
+ent_number=tk.Entry(root)
+ent_number.pack()
+
+btn=tk.Button(root,text="Daxil ol",bg="pink",fg="white",command=login)
+btn.pack(pady=10)
+
+btn1=tk.Button(root,text="Qeydiyyat",bg="#2196f3",fg="white",command=register_page)
+btn1.pack()
+
+
+root.mainloop()
